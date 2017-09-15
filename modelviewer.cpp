@@ -4,16 +4,24 @@
 #include <iostream>
 #include <fstream>
 
-
+using namespace std;
 
 int main(int argc, char *argv[]){
   if (argc != 2){
-    std::cout << "Invalid. Please input 1 file only.\n";
-    return 1;
+    cout << "Invalid. Please input one file.\n";
+    exit(1);
   }
-  std::string file = argv[1];
-  std::cout << "file name:" << file << std::endl;
+  //cout << "opening file " << argv[1] << endl;
+  ifstream infile;
+  infile.open(argv[1]);
+  if (!infile) {
+        cout << "Unable to open file\n";
+        exit(2); // terminate with error
+  }
 
+  //malloc data
+  while (infile >> data) {
 
+  }
   return 0;
 }
