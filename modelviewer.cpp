@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <regex>
 #include <vector>
+#include <iomanip>
 
 using namespace std;
 
@@ -13,14 +14,15 @@ using namespace std;
 void read(string filename, vector<double> &v, vector<int> &f);
 vector<double> split_v(string str);
 vector<int> split_f(string str);
+void write(vector<double> &v, vector<int> &f);
 
 //globals
-string obj_name;
+int face_sides = 0;
 
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 int main(int argc, char *argv[]){
   if (argc != 2){
     cout << "Invalid. Please input one file.\n";
@@ -34,29 +36,32 @@ int main(int argc, char *argv[]){
   while (command.compare(q)!= 0){
     cout << "\nCommands: Quit(q)\nEnter command:";
     cin >> command;
-    cout << "you entered: " << command << endl;
     if (command.compare(w)==0){
       vector<double> v_vector;
       vector<int> f_vector;
       read(argv[1], v_vector, f_vector);
-      vector <double> :: iterator i;
-      vector <int> :: iterator j;
+      // vector <double> :: iterator i;
+      // vector <int> :: iterator j;
       //print result
-      cout << "v_vector: \n";
-      for (i = v_vector.begin(); i != v_vector.end(); ++i)
-        cout << *i << " ";
-      cout << endl;
-      cout << "f_vector: \n";
-      for (j = f_vector.begin(); j != f_vector.end(); ++j)
-        cout << *j << " ";
-      cout << endl;
+      // cout << "v_vector: \n";
+      // for (i = v_vector.begin(); i != v_vector.end(); ++i)
+      //   cout << *i << " ";
+      // cout << endl;
+      // cout << "f_vector: \n";
+      // for (j = f_vector.begin(); j != f_vector.end(); ++j)
+      //   cout << *j << " ";
+      // cout << endl;
+      write(v_vector, f_vector);
     }
+
+    cout << "---------------------------------------------------------------\n";
+
   }
   //end program
   cout << "Goodbye!\n";
   return 0;
 }
-////////////////////////////////////////////////////////////////////////////
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
@@ -72,7 +77,7 @@ void read(string filename, vector<double> &v, vector<int> &f){
     while ( getline (infile,line) ){
       if (line[0]=='v'){
         //add to vertex array
-        cout << line << endl;
+        //cout << line << endl;
         vector<double> vertices;
         vertices = split_v(line);
         vector <double> :: iterator i;
@@ -81,21 +86,54 @@ void read(string filename, vector<double> &v, vector<int> &f){
       }
       if(line[0]=='f'){
         //add to face array
-        cout << line << endl;
+        //cout << line << endl;
         vector<int> faces;
         faces = split_f(line);
         vector <int> :: iterator j;
+        if (!face_sides) face_sides = faces.size();
         for (j = faces.begin(); j != faces.end(); ++j)
           f.push_back(*j);
-
       }
+
     }
   }
   infile.close();
 }
-void write_to_file(){
+
+void write(vector<double> &v, vector<int> &f){
   ofstream outfile;
-  outfile.open("out.obj");
+  outfile.open ("out.obj");
+  //outfile << "Writing this to a file.\n";
+  int m = 0, n = 0;
+  //write v lines
+  outfile << std::fixed;
+  outfile << std::setprecision(6);
+  while (m < v.size()/3){
+    outfile << "v ";
+    for(int i=0; i<3; i++){
+      double d = v[3*m+i];
+      outfile << d << " ";
+    }
+    m++;
+    outfile << endl;
+  }
+
+  //write f lines
+  outfile << std::setprecision(0);
+  vector <int> :: iterator f_it;
+  while (n < f.size()/3){
+    outfile << "f ";
+    for(int i=0; i<face_sides; i++){
+      int in = f[face_sides*n+i];
+      outfile << in << " ";
+    }
+    n++;
+    outfile << endl;
+  }
+
+  //close file
+  outfile.close();
+  cout << "\n Data written to: out.obj \n";
 }
 
 vector<double> split_v(string str){
