@@ -3,8 +3,20 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
+#include <regex>
 
 using namespace std;
+
+//function prototypes
+void read_lines(ifstream file);
+
+//globals
+string obj_name;
+double *temp;
+int v_count, f_count;
+double v_array[] = malloc(sizeof(double));
+double f_array[] = malloc(sizeof(double));
 
 int main(int argc, char *argv[]){
   if (argc != 2){
@@ -13,24 +25,21 @@ int main(int argc, char *argv[]){
   }
   //cout << "opening file " << argv[1] << endl;
   ifstream infile;
-  string line;
+  //open file
   infile.open(argv[1]);
   if (!infile) {
         cout << "Unable to open file\n";
         exit(2); //terminate with error
-  }
-  else{
-    //initialize arrays & variables
-    string obj_name;
-    v_array = malloc(sizeof(string));
+  }else{
     //read data into arrays & variables
-    read_lines(infile, line);
+    read_lines(infile);
   }
 
   //ask for user command repeatedly
   string command;
-  while (command != 'q'){
+  while (command != "q"){
     cin >> command;
+    cout << "command: " << command << endl;
 
   }
   //end program
@@ -40,18 +49,22 @@ int main(int argc, char *argv[]){
 }
 
 
-void read_lines(ifstream, string, *vertex_array, *face_array){
-  while ( getline (infile,line) )
+void read_lines(ifstream file){
+  string line;
+  regex re("(-)?\\d+((\\.)?\\d+)?");
+  while ( getline (file,line) )
   {
     if (line[0]=='v'){
       //add to vertex array
-
+      cout << line;
     }
-    elif (line[0]=='f'){
+    else if(line[0]=='f'){
       //add to face array
+      cout << line;
     }
-    elif (line[0]=='o'){
+    else if(line[0]=='o'){
       //store object name
+      cout << line;
     }
 
   }
