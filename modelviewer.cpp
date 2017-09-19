@@ -38,34 +38,25 @@ int main(int argc, char *argv[]){
     exit(1);
   }
 
+  //read file
+  vector<double> v_vector;
+  vector<int> f_vector;
+  read(input, v_vector, f_vector);
 
-  //ask for user command repeatedly
+  //ask for user commands repeatedly until they quit
+  cout << "\nWelcome to Model Viewer. Please type in one of the following commands.";
   string command, q="q",w="w";
-
   while (command.compare(q)!= 0){
-    cout << "\nCommands: Quit(q)\nEnter command:";
+    //cout << "---------------------------------------------------------------";
+    cout << "\nCommands:\n-  Quit(q)\n-  Write to file(w)\nEnter command:";
     cin >> command;
+    //w = write to file
     if (command.compare(w)==0){
-      vector<double> v_vector;
-      vector<int> f_vector;
-      read(input, v_vector, f_vector);
-      // vector <double> :: iterator i;
-      // vector <int> :: iterator j;
-      //print result
-      // cout << "v_vector: \n";
-      // for (i = v_vector.begin(); i != v_vector.end(); ++i)
-      //   cout << *i << " ";
-      // cout << endl;
-      // cout << "f_vector: \n";
-      // for (j = f_vector.begin(); j != f_vector.end(); ++j)
-      //   cout << *j << " ";
-      // cout << endl;
       write(v_vector, f_vector);
     }
-
     cout << "---------------------------------------------------------------\n";
-
   }
+
   //end program
   cout << "Goodbye!\n";
   return 0;
@@ -74,6 +65,23 @@ int main(int argc, char *argv[]){
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
+/*calculate average of all points, find vector of translation from average
+point to origin, translate all vertices with the vector of translation*/
+void center(){
+  //calculate average x
+  //calculate average y
+  //calculate average z
+  //calculate translation vector from (x,y,z) to (0,0,0)
+  //apply to all points
+}
+
+/**/
+void scale(){
+  //find min x, max x, min y, max y
+}
+
+
+/*read obj file and adds data to a v list and f list (vector lists)*/
 void read(string filename, vector<double> &v, vector<int> &f){
   ifstream infile;
   infile.open(filename);
@@ -105,12 +113,12 @@ void read(string filename, vector<double> &v, vector<int> &f){
         for (j = faces.begin(); j != faces.end(); ++j)
           f.push_back(*j);
       }
-
     }
   }
   infile.close();
 }
 
+/*write v list and f list info to new file called "out.obj "*/
 void write(vector<double> &v, vector<int> &f){
   ofstream outfile;
   outfile.open ("out.obj");
@@ -144,7 +152,8 @@ void write(vector<double> &v, vector<int> &f){
   cout << "\n Data written to: out.obj \n";
 }
 
-vector<double> split_v(string str){
+/*split string for v lines and returns a vector*/
+cvector<double> split_v(string str){
   regex re("(-)?\\d+((\\.)?\\d+)?");
   sregex_iterator begin(str.begin(), str.end(), re);
   sregex_iterator end;
@@ -163,6 +172,8 @@ vector<double> split_v(string str){
   return output;
 }
 
+/*split string for f lines and returns a vector.
+Helper function for read*/
 vector<int> split_f(string str){
   regex re("\\d+"); //look for integers
   sregex_iterator begin(str.begin(), str.end(), re);
