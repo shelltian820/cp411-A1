@@ -18,6 +18,8 @@ void write(vector<double> &v, vector<int> &f);
 
 //globals
 int face_sides = 0;
+int num_vertices = 0;
+int num_faces = 0;
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -27,6 +29,13 @@ int main(int argc, char *argv[]){
   if (argc != 2){
     cout << "Invalid. Please input one file.\n";
     exit(1); //terminate with error
+  }
+  string input = argv[1];
+  string obj = ".obj";
+  string input_end = input.substr(input.size()-4);
+  if ( input_end.compare(obj) ){
+    cout << "Invalid. Please input \".obj\" file.\n";
+    exit(1);
   }
 
 
@@ -39,7 +48,7 @@ int main(int argc, char *argv[]){
     if (command.compare(w)==0){
       vector<double> v_vector;
       vector<int> f_vector;
-      read(argv[1], v_vector, f_vector);
+      read(input, v_vector, f_vector);
       // vector <double> :: iterator i;
       // vector <int> :: iterator j;
       //print result
@@ -73,11 +82,12 @@ void read(string filename, vector<double> &v, vector<int> &f){
         exit(2); //terminate with error
   }else{
     string line;
-    regex re("(-)?\\d+((\\.)?\\d+)?");
+    //regex re("(-)?\\d+((\\.)?\\d+)?");
     while ( getline (infile,line) ){
       if (line[0]=='v'){
         //add to vertex array
         //cout << line << endl;
+        num_vertices++;
         vector<double> vertices;
         vertices = split_v(line);
         vector <double> :: iterator i;
@@ -87,6 +97,7 @@ void read(string filename, vector<double> &v, vector<int> &f){
       if(line[0]=='f'){
         //add to face array
         //cout << line << endl;
+        num_faces++;
         vector<int> faces;
         faces = split_f(line);
         vector <int> :: iterator j;
@@ -104,30 +115,27 @@ void write(vector<double> &v, vector<int> &f){
   ofstream outfile;
   outfile.open ("out.obj");
   //outfile << "Writing this to a file.\n";
-  int m = 0, n = 0;
   //write v lines
   outfile << std::fixed;
   outfile << std::setprecision(6);
-  while (m < v.size()/3){
+  for(int m=0; m<num_vertices; m++){
     outfile << "v ";
     for(int i=0; i<3; i++){
       double d = v[3*m+i];
       outfile << d << " ";
     }
-    m++;
     outfile << endl;
   }
 
   //write f lines
   outfile << std::setprecision(0);
   vector <int> :: iterator f_it;
-  while (n < f.size()/3){
+  for(int n=0; n<num_faces; n++){
     outfile << "f ";
     for(int i=0; i<face_sides; i++){
       int in = f[face_sides*n+i];
       outfile << in << " ";
     }
-    n++;
     outfile << endl;
   }
 
