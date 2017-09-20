@@ -11,14 +11,13 @@
 using namespace std;
 
 //function prototypes
-void read(string filename, vector<double> &v, vector<int> &f);
+void read(string filename, vector<double> &v, vector<vector<int>> &f);
 vector<double> split_v(string str);
 vector<int> split_f(string str);
-void write(vector<double> &v, vector<int> &f);
-void center(vector<double> v, vector<int> f);
+void write(vector<double> v, vector<vector<int>> f);
+void center(vector<double> v, vector<vector<int>> f);
 
 //globals
-int face_sides = 0; //updated by read()
 int num_vertices = 0; //updated by read()
 int num_faces = 0; //updated by read()
 
@@ -41,7 +40,7 @@ int main(int argc, char *argv[]){
 
   //read file
   vector<double> v_vector;
-  vector<int> f_vector;
+  vector<vector<int>> f_vector;
   read(input, v_vector, f_vector);
 
   //ask for user commands repeatedly until they quit
@@ -74,7 +73,7 @@ int main(int argc, char *argv[]){
 
 /*calculate average of all points, find vector of translation from average
 point to origin, translate all vertices with the vector of translation*/
-void center(vector<double> v, vector<int> f){ //if not &v, works with copy of v
+void center(vector<double> v, vector<vector<int>> f){ //if not &v, works with copy of v
   double n = double(num_vertices);
 
   //calculate average x
@@ -121,7 +120,7 @@ void scale(){
 
 
 /*read obj file and adds data to a v list and f list (vector lists)*/
-void read(string filename, vector<double> &v, vector<int> &f){
+void read(string filename, vector<double> &v, vector<vector<int>> &f){
   ifstream infile;
   infile.open(filename);
   if (!infile) {
@@ -145,12 +144,9 @@ void read(string filename, vector<double> &v, vector<int> &f){
         //add to face array
         //cout << line << endl;
         num_faces++;
-        vector<int> faces;
-        faces = split_f(line);
-        vector <int> :: iterator j;
-        if (!face_sides) face_sides = faces.size();
-        for (j = faces.begin(); j != faces.end(); ++j)
-          f.push_back(*j);
+        vector<int> face;
+        face = split_f(line);
+        f.push_back(face);
       }
     }
   }
@@ -158,7 +154,7 @@ void read(string filename, vector<double> &v, vector<int> &f){
 }
 
 /*write v list and f list info to new file called "out.obj "*/
-void write(vector<double> &v, vector<int> &f){
+void write(vector<double> v, vector<vector<int>> f){
   ofstream outfile;
   outfile.open ("out.obj");
   //outfile << "Writing this to a file.\n";
@@ -176,13 +172,13 @@ void write(vector<double> &v, vector<int> &f){
 
   //write f lines
   outfile << std::setprecision(0);
-  vector <int> :: iterator f_it;
+  vector <int> :: iterator it;
   for(int n=0; n<num_faces; n++){
     outfile << "f ";
-    for(int i=0; i<face_sides; i++){
-      int in = f[face_sides*n+i];
-      outfile << in << " ";
-    }
+    //change
+    vector<int> face = f[n];
+    for (it = face.begin(); it != face.end(); ++it)
+      outfile << *it << " ";
     outfile << endl;
   }
 
