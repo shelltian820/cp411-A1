@@ -74,7 +74,32 @@ void vectors(){
   cout << endl;
   cout << "back() : g1.back() = " << g1.back();
   cout << endl;
+}
 
+void pass_vector_args(){
+  std::vector<int> v;
+    std::vector<int> u;
+    u.assign ({1,1,1,1,1,1,1,1,1,1});
+    f(v);
+    g(u);
+
+    for ( int x : v ) std::cout << x << ' ';
+    std::cout << std::endl;
+
+    for ( int x : u ) std::cout << x << ' ';
+    std::cout << std::endl;
+}
+void f( std::vector<int> &v )
+{
+    v.assign( { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } );
+    for ( int x : v ) std::cout << x << ' ';
+    std::cout << std::endl;
+}
+void g( std::vector<int> v )
+{
+    v.assign( { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } );
+    for ( int x : v ) std::cout << x << ' ';
+    std::cout << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -85,5 +110,6 @@ int main()
 {
   //regex_num();
   //strtod();
-  vectors();
+  //vectors();
+  //pass_vector_args();
 }

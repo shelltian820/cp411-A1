@@ -15,11 +15,12 @@ void read(string filename, vector<double> &v, vector<int> &f);
 vector<double> split_v(string str);
 vector<int> split_f(string str);
 void write(vector<double> &v, vector<int> &f);
+void center(vector<double> v, vector<int> f);
 
 //globals
-int face_sides = 0;
-int num_vertices = 0;
-int num_faces = 0;
+int face_sides = 0; //updated by read()
+int num_vertices = 0; //updated by read()
+int num_faces = 0; //updated by read()
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -45,7 +46,7 @@ int main(int argc, char *argv[]){
 
   //ask for user commands repeatedly until they quit
   cout << "\nWelcome to Model Viewer. Please type in one of the following commands.";
-  string command, q="q",w="w";
+  string command, q="q", w="w", c="c";
   while (command.compare(q)!= 0){
     //cout << "---------------------------------------------------------------";
     cout << "\nCommands:\n-  Quit(q)\n-  Write to file(w)\nEnter command:";
@@ -54,6 +55,12 @@ int main(int argc, char *argv[]){
     if (command.compare(w)==0){
       write(v_vector, f_vector);
     }
+    //c = center object
+    if (command.compare(c)==0){
+      center(v_vector, f_vector);
+    }
+
+
     cout << "---------------------------------------------------------------\n";
   }
 
@@ -67,12 +74,44 @@ int main(int argc, char *argv[]){
 
 /*calculate average of all points, find vector of translation from average
 point to origin, translate all vertices with the vector of translation*/
-void center(){
+void center(vector<double> v, vector<int> f){ //if not &v, works with copy of v
+  double n = double(num_vertices);
+
   //calculate average x
+  double total_x = 0.000000;
+  for(int i = 0; i < num_vertices; i++){
+    double x_coord = v[i*3];
+    total_x += x_coord;
+  }
+  double avg_x = total_x/n;
+
   //calculate average y
+  double total_y = 0.000000;
+  for(int i = 0; i < num_vertices; i++){
+    double y_coord = v[i*3+1];
+    total_y += y_coord;
+  }
+  double avg_y = total_y/n;
+
   //calculate average z
+  double total_z = 0.000000;
+  for(int i = 0; i < num_vertices; i++){
+    double z_coord = v[i*3+2];
+    total_z += z_coord;
+  }
+  double avg_z = total_z/n;
+
+  //print
+  cout << fixed;
+  cout << setprecision(6);
+  cout << avg_x << " ";
+  cout << avg_y << " ";
+  cout << avg_z << endl;
+
   //calculate translation vector from (x,y,z) to (0,0,0)
   //apply to all points
+
+  //change later
 }
 
 /**/
@@ -153,7 +192,7 @@ void write(vector<double> &v, vector<int> &f){
 }
 
 /*split string for v lines and returns a vector*/
-cvector<double> split_v(string str){
+vector<double> split_v(string str){
   regex re("(-)?\\d+((\\.)?\\d+)?");
   sregex_iterator begin(str.begin(), str.end(), re);
   sregex_iterator end;
