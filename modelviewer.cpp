@@ -62,6 +62,10 @@ int main(int argc, char *argv[]){
   //read file
   read(input, v_vector, f_vector);
 
+  //center & scale object
+  center_and_scale(v_vector);
+
+
   //set up OpenGL
   glutInit(&argc, argv);
   glutInitContextVersion(4, 3);
@@ -101,11 +105,42 @@ void setup(void)
 
 void drawScene(){
   glClear (GL_COLOR_BUFFER_BIT);
-  glColor3f(1.0, 1.0, 1.0); //make object white
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
   anObject = glGenLists(1);
   glNewList(anObject, GL_COMPILE);
+  //add triangles
+  glBegin(GL_TRIANGLES);
+    for(int i=0; i < f_vector.size(); i++){
+      vector<float> p1 = v_vector[f_vector[i][0]-1];
+      vector<float> p2 = v_vector[f_vector[i][1]-1];
+      vector<float> p3 = v_vector[f_vector[i][2]-1];
+      glVertex3f(p1[0], p1[1], p1[2]);
+      glVertex3f(p2[0], p2[1], p2[2]);
+      glVertex3f(p3[0], p3[1], p3[2]);
+    }
+  glEnd();
 
 
+  // for(int i=0; i < f_vector.size(); i++){
+  //   glBegin(GL_TRIANGLES);
+  //       vector<float> p1 = v_vector[f_vector[i][0]-1];
+  //       vector<float> p2 = v_vector[f_vector[i][1]-1];
+  //       vector<float> p3 = v_vector[f_vector[i][2]-1];
+  //       glVertex3f(p1[0], p1[1], p1[2]);
+  //       glVertex3f(p2[0], p2[1], p2[2]);
+  //       glVertex3f(p3[0], p3[1], p3[2]);
+  //   glEnd();
+  // }
+
+  glEndList();
+
+  glColor3f(1.0, 1.0, 1.0); //make object white
+  glPushMatrix();
+  glCallList(anObject);
+  glPopMatrix();
+
+  glFlush();
 
 }
 
@@ -127,8 +162,8 @@ void resize(int w, int h){
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//glOrtho(-100.0, 100.0, -100.0, 100.0, -1.0, 1.0);
-  glOrtho(-1.0, 1.0, -1.0, 1.0, -8, 100);
+	//glOrtho(-5.0, 5.0, -5.0, 5.0, -8.0, 100.0);
+  glOrtho(-1.0, 1.0, -1.0, 1.0, -8.0, 100.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
