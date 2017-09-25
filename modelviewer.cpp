@@ -1,6 +1,8 @@
 
 //TODO:
 /*
+ISSUES
+-translating z in ortho mode doesn't works
 -
 */
 
@@ -33,8 +35,9 @@ using namespace std;
 static unsigned int anObject; //for display list
 vector<vector<float>> v_vector;
 vector<vector<int>> f_vector;
-static float Xvalue = 0.0, Yvalue = 0.0;
-static int view_mode = 1;
+static float Xvalue = 0.0, Yvalue = 0.0, Zvalue = -10.0;// values to translate
+static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // angles to rotate
+static int view_mode = 0;
 //function prototypes
 void keyInput(unsigned char key, int x, int y);
 void specialKeyInput(int key, int x, int y);
@@ -102,7 +105,6 @@ void setup(void)
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 
-  //setup camera
 }
 
 void drawScene(){
@@ -117,8 +119,6 @@ void drawScene(){
     glOrtho(-1.0, 1.0, -1.0, 1.0, -8.0, 100.0);
   	glMatrixMode(GL_MODELVIEW);
   	glLoadIdentity();
-
-    glutPostRedisplay();
   } else if (view_mode == 1){
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity();
@@ -126,12 +126,13 @@ void drawScene(){
     //gluPerspective(30.0, 1.0, 1.0, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    glutPostRedisplay();
   }
   glPushMatrix();
 
-  glTranslatef(Xvalue, Yvalue, -10.0);
+  glTranslatef(Xvalue, Yvalue, Zvalue);
+  glRotatef(Zangle, 0.0, 0.0, 1.0);
+  glRotatef(Yangle, 0.0, 1.0, 0.0);
+  glRotatef(Xangle, 1.0, 0.0, 0.0);
 
   anObject = glGenLists(1);
   glNewList(anObject, GL_COMPILE);
@@ -168,10 +169,52 @@ void keyInput(unsigned char key, int x, int y){
         break;
       case 'v':
         view_mode = 0;
+        glutPostRedisplay();
         break;
       case 'V':
         view_mode = 1;
+        glutPostRedisplay();
         break;
+      case 'n':
+        Zvalue -= 0.1;
+        glutPostRedisplay();
+        break;
+      case 'N':
+        Zvalue += 0.1;
+        glutPostRedisplay();
+        break;
+      //angles
+      case 'p':
+        Xangle -= 10.0;
+        if (Xangle < 0.0) Xangle += 360.0;
+        glutPostRedisplay();
+        break;
+      case 'P':
+        Xangle += 10.0;
+        if (Xangle > 360.0) Xangle -=360.0;
+        glutPostRedisplay();
+        break;
+      case 'y':
+        Yangle -= 10.0;
+        if (Yangle < 0.0) Yangle += 360.0;
+        glutPostRedisplay();
+        break;
+      case 'Y':
+        Yangle += 10.0;
+        if (Yangle > 360.0) Yangle -=360.0;
+        glutPostRedisplay();
+        break;
+      case 'r':
+        Zangle -= 10.0;
+        if (Zangle < 0.0) Zangle += 360.0;
+        glutPostRedisplay();
+        break;
+      case 'R':
+        Zangle += 10.0;
+        if (Zangle > 360.0) Zangle -=360.0;
+        glutPostRedisplay();
+        break;
+
       default:
          break;
    }

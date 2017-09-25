@@ -68,7 +68,7 @@ void scale(vector<vector<float>> &v){
   for(int i = 0; i < num_vertices; i++){
     v[i][0] = (v[i][0] / scale) * 1.25;
     v[i][1] = (v[i][1] / scale) * 1.25;
-    v[i][2] = ((v[i][2] / scale) * 1.25) - 10.0; 
+    v[i][2] = ((v[i][2] / scale) * 1.25) ; 
 
   }
 
