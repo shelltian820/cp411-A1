@@ -63,7 +63,8 @@ int main(int argc, char *argv[]){
   read(input, v_vector, f_vector);
 
   //center & scale object
-  center_and_scale(v_vector);
+  center(v_vector);
+  scale(v_vector);
 
 
   //set up OpenGL
@@ -162,7 +163,7 @@ void resize(int w, int h){
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//glOrtho(-5.0, 5.0, -5.0, 5.0, -8.0, 100.0);
+	//glOrtho(-10.0, 10.0, -10.0, 10.0, -8.0, 100.0);
   glOrtho(-1.0, 1.0, -1.0, 1.0, -8.0, 100.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
