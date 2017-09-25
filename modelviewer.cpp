@@ -2,7 +2,7 @@
 //TODO:
 /*
 ISSUES
--translating z in ortho mode doesn't works
+-translating z in ortho mode doesn't work
 -
 */
 
@@ -37,6 +37,9 @@ vector<vector<float>> v_vector;
 vector<vector<int>> f_vector;
 static float Xvalue = 0.0, Yvalue = 0.0, Zvalue = -10.0;// values to translate
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // angles to rotate
+static float Oleft = -1.0, Oright = 1.0, Obottom = -1.0, Otop = 1.0, Onear = -8.0, Ofar = 100.0; //camera for Ortho mode
+static float Pleft = -1.0, Pright = 1.0, Pbottom = -1.0, Ptop = 1.0, Pnear = 9.0, Pfar = 100.0; //camera for Perspective mode
+
 static int view_mode = 0;
 //function prototypes
 void keyInput(unsigned char key, int x, int y);
@@ -112,18 +115,17 @@ void drawScene(){
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   //toggle perspective
-  if (view_mode == 0){
+  if (view_mode == 0){ //ORTHOGRAPHIC VIEW
     glMatrixMode(GL_PROJECTION);
   	glLoadIdentity();
-  	//glOrtho(-10.0, 10.0, -10.0, 10.0, -8.0, 100.0);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -8.0, 100.0);
+    glOrtho(Oleft, Oright, Obottom, Otop, Onear, Ofar);
   	glMatrixMode(GL_MODELVIEW);
   	glLoadIdentity();
-  } else if (view_mode == 1){
+  }
+  if (view_mode == 1){ //PERSECTIVE VIEW
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-1.0, 1.0, -1.0, 1.0, 9.0, 100.0);
-    //gluPerspective(30.0, 1.0, 1.0, 100.0);
+    glFrustum(Pleft, Pright, Pbottom, Ptop, Pnear, Pfar);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
   }
@@ -183,7 +185,8 @@ void keyInput(unsigned char key, int x, int y){
         Zvalue += 0.1;
         glutPostRedisplay();
         break;
-      //angles
+
+      //object rotation
       case 'p':
         Xangle -= 10.0;
         if (Xangle < 0.0) Xangle += 360.0;
@@ -214,6 +217,39 @@ void keyInput(unsigned char key, int x, int y){
         if (Zangle > 360.0) Zangle -=360.0;
         glutPostRedisplay();
         break;
+
+      //camera translation
+      case 'd':
+        Oleft -= 0.1; Pleft -= 0.1;
+        Oright -= 0.1; Pright -= 0.1;
+        glutPostRedisplay();
+        break;
+      case 'D':
+        Oleft += 0.1; Pleft += 0.1;
+        Oright += 0.1; Pright += 0.1;
+        glutPostRedisplay();
+        break;
+      case 'c':
+        Obottom -= 0.1; Otop -= 0.1;
+        Pbottom -= 0.1; Ptop -= 0.1;
+        glutPostRedisplay();
+        break;
+      case 'C':
+        Obottom += 0.1; Otop += 0.1;
+        Pbottom += 0.1; Ptop += 0.1;
+        glutPostRedisplay();
+        break;
+      case 'z':
+        Onear -= 0.1; Ofar -= 0.1;
+        Pnear -= 0.1; Pnear -= 0.1;
+        glutPostRedisplay();
+        break;
+      case 'Z':
+        Onear += 0.1; Ofar += 0.1;
+        Pnear += 0.1; Pnear += 0.1;
+        glutPostRedisplay();
+        break;
+
 
       default:
          break;
