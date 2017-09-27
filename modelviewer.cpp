@@ -47,6 +47,7 @@ void specialKeyInput(int key, int x, int y);
 void drawScene();
 void resize(int w, int h);
 void setup();
+void reset();
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -165,6 +166,9 @@ void keyInput(unsigned char key, int x, int y){
    {
       case 'q':
         exit(0);
+        break;
+      case 'x':
+        reset();
         break;
       case 'w':
         write(v_vector,f_vector);
@@ -285,4 +289,12 @@ void resize(int w, int h){
   //gluPerspective(60.0, 1.0, -8.0, 100.0);
 	// glMatrixMode(GL_MODELVIEW);
 	// glLoadIdentity();
+}
+
+void reset(){
+  Xvalue = 0.0, Yvalue = 0.0, Zvalue = -10.0;
+  Xangle = 0.0, Yangle = 0.0, Zangle = 0.0;
+  Oleft = -1.0, Oright = 1.0, Obottom = -1.0, Otop = 1.0, Onear = -8.0, Ofar = 100.0;
+  Pleft = -1.0, Pright = 1.0, Pbottom = -1.0, Ptop = 1.0, Pnear = 9.0, Pfar = 100.0;
+  glutPostRedisplay();
 }
