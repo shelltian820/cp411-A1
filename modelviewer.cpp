@@ -2,8 +2,8 @@
 //TODO:
 /*
 ISSUES
--translating z in ortho mode doesn't work
--
+-translating z in ortho mode doesn't work?
+-translate on object's own axis
 */
 
 
@@ -35,6 +35,9 @@ using namespace std;
 static unsigned int anObject; //for display list
 vector<vector<float>> v_vector;
 vector<vector<int>> f_vector;
+vector<float> center_point;
+static float obj_scale;
+
 static float Xvalue = 0.0, Yvalue = 0.0, Zvalue = -10.0;// values to translate
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // angles to rotate
 static float Oleft = -1.0, Oright = 1.0, Obottom = -1.0, Otop = 1.0, Onear = -8.0, Ofar = 100.0; //camera for Ortho mode
@@ -48,6 +51,8 @@ void drawScene();
 void resize(int w, int h);
 void setup();
 void reset();
+void translate_obj(float Xvalue, float Yvalue, float Zvalue);
+void rotate_obj(float Xangle, float Yangle, float Zangle);
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -70,9 +75,8 @@ int main(int argc, char *argv[]){
   read(input, v_vector, f_vector);
 
   //center & scale object
-  center(v_vector);
-  scale(v_vector);
-
+  center_point = center(v_vector);
+  obj_scale = scale(v_vector);
 
   //set up OpenGL
   glutInit(&argc, argv);
@@ -108,7 +112,23 @@ int main(int argc, char *argv[]){
 void setup(void)
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-
+  
+  anObject = glGenLists(1);
+  glNewList(anObject, GL_COMPILE);
+  //add triangles
+  glBegin(GL_TRIANGLES);
+    for(int i=0; i < f_vector.size(); i++){
+      vector<float> p1 = v_vector[f_vector[i][0]-1];
+      vector<float> p2 = v_vector[f_vector[i][1]-1];
+      vector<float> p3 = v_vector[f_vector[i][2]-1];
+      glVertex3f(p1[0], p1[1], p1[2]);
+      glVertex3f(p2[0], p2[1], p2[2]);
+      glVertex3f(p3[0], p3[1], p3[2]);
+    }
+  glEnd();
+  glEndList();
+  
+  
 }
 
 void drawScene(){
@@ -130,28 +150,10 @@ void drawScene(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
   }
-  glPushMatrix();
 
-  glTranslatef(Xvalue, Yvalue, Zvalue);
-  glRotatef(Zangle, 0.0, 0.0, 1.0);
-  glRotatef(Yangle, 0.0, 1.0, 0.0);
-  glRotatef(Xangle, 1.0, 0.0, 0.0);
-
-  anObject = glGenLists(1);
-  glNewList(anObject, GL_COMPILE);
-  //add triangles
-  glBegin(GL_TRIANGLES);
-    for(int i=0; i < f_vector.size(); i++){
-      vector<float> p1 = v_vector[f_vector[i][0]-1];
-      vector<float> p2 = v_vector[f_vector[i][1]-1];
-      vector<float> p3 = v_vector[f_vector[i][2]-1];
-      glVertex3f(p1[0], p1[1], p1[2]);
-      glVertex3f(p2[0], p2[1], p2[2]);
-      glVertex3f(p3[0], p3[1], p3[2]);
-    }
-  glEnd();
-  glEndList();
-
+  translate_obj(Xvalue, Yvalue, Zvalue);
+  rotate_obj(Xangle, Yangle, Zangle);
+  
   glColor3f(1.0, 1.0, 1.0); //make object white
   glPushMatrix();
   glCallList(anObject);
@@ -284,11 +286,7 @@ void resize(int w, int h){
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//glOrtho(-10.0, 10.0, -10.0, 10.0, -8.0, 100.0);
-  //glOrtho(-1.0, 1.0, -1.0, 1.0, -8.0, 100.0);
-  //gluPerspective(60.0, 1.0, -8.0, 100.0);
-	// glMatrixMode(GL_MODELVIEW);
-	// glLoadIdentity();
+	
 }
 
 void reset(){
@@ -297,4 +295,20 @@ void reset(){
   Oleft = -1.0, Oright = 1.0, Obottom = -1.0, Otop = 1.0, Onear = -8.0, Ofar = 100.0;
   Pleft = -1.0, Pright = 1.0, Pbottom = -1.0, Ptop = 1.0, Pnear = 9.0, Pfar = 100.0;
   glutPostRedisplay();
+}
+
+void translate_obj(float Xvalue, float Yvalue, float Zvalue){
+  //textbook fig4.8
+  glTranslatef(Xvalue, Yvalue, Zvalue);
+  //glRotatef(Zangle, 0.0, 0.0, 1.0);
+  //glRotatef(Yangle, 0.0, 1.0, 0.0);
+  //glRotatef(Xangle, 1.0, 0.0, 0.0);
+}
+
+
+
+void rotate_obj(float Xangle, float Yangle, float Zangle){
+  glRotatef(Zangle, 0.0, 0.0, 1.0);
+  glRotatef(Yangle, 0.0, 1.0, 0.0);
+  glRotatef(Xangle, 1.0, 0.0, 0.0);
 }

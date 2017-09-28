@@ -2,7 +2,7 @@ using namespace std;
 
 /*calculate average of all points, find vector of translation from average
 point to origin, translate all vertices with the vector of translation*/
-void center(vector<vector<float>> &v){ //if not &v, works with copy of v
+vector<float> center(vector<vector<float>> &v){ //if not &v, works with copy of v
   int num_vertices = v.size();
 
   //calculate average x
@@ -39,10 +39,13 @@ void center(vector<vector<float>> &v){ //if not &v, works with copy of v
     v[i][2] = change_z + v[i][2]; //z
   }
   //cout << avg_x << " " << avg_y << " " << avg_z << endl;
+  vector<float> center_coords;
+  center_coords.assign({avg_x,avg_y,avg_z});
+  return center_coords;
 }
 
 
-void scale(vector<vector<float>> &v){
+float scale(vector<vector<float>> &v){
   int num_vertices = v.size();
 
  float min_x = 9999.0, min_y = 9999.0, min_z = 9999.0,
@@ -71,6 +74,9 @@ void scale(vector<vector<float>> &v){
     v[i][2] = ((v[i][2] / scale) * 1.25) ; 
 
   }
-
-
+  
+  return scale;
 }
+
+
+
