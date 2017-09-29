@@ -2,8 +2,8 @@
 //TODO:
 /*
 ISSUES
--translating z in ortho mode doesn't work?
 -translate on object's own axis
+-store current rotation & translation matrices!
 */
 
 
@@ -38,12 +38,15 @@ vector<vector<int>> f_vector;
 vector<float> center_point;
 static float obj_scale;
 
-static float Xvalue = 0.0, Yvalue = 0.0, Zvalue = -10.0;// values to translate
+static float Xvalue = 0.0, Yvalue = 0.0, Zvalue = 0.0;// values to translate
+static float local_x = 0.0, local_y = 0.0, local_z = 0.0;
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // angles to rotate
 static float Oleft = -1.0, Oright = 1.0, Obottom = -1.0, Otop = 1.0, Onear = -8.0, Ofar = 100.0; //camera for Ortho mode
 static float Pleft = -1.0, Pright = 1.0, Pbottom = -1.0, Ptop = 1.0, Pnear = 9.0, Pfar = 100.0; //camera for Perspective mode
-
 static int view_mode = 0;
+
+
+
 //function prototypes
 void keyInput(unsigned char key, int x, int y);
 void specialKeyInput(int key, int x, int y);
@@ -51,8 +54,8 @@ void drawScene();
 void resize(int w, int h);
 void setup();
 void reset();
-void translate_obj(float Xvalue, float Yvalue, float Zvalue);
-void rotate_obj(float Xangle, float Yangle, float Zangle);
+void translate_obj();
+void rotate_obj();
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -87,12 +90,12 @@ int main(int argc, char *argv[]){
   glutInitWindowPosition(100, 100);
   glutCreateWindow("Object");
 
-  glutDisplayFunc(drawScene);
+  setup(); //called once
+
+  glutDisplayFunc(drawScene); //called every time something changes
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyInput);
   glutSpecialFunc(specialKeyInput);
-
-  setup();
 
   glewExperimental = GL_TRUE;
   glewInit();
@@ -112,7 +115,7 @@ int main(int argc, char *argv[]){
 void setup(void)
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-  
+
   anObject = glGenLists(1);
   glNewList(anObject, GL_COMPILE);
   //add triangles
@@ -127,8 +130,9 @@ void setup(void)
     }
   glEnd();
   glEndList();
-  
-  
+
+
+
 }
 
 void drawScene(){
@@ -142,6 +146,8 @@ void drawScene(){
     glOrtho(Oleft, Oright, Obottom, Otop, Onear, Ofar);
   	glMatrixMode(GL_MODELVIEW);
   	glLoadIdentity();
+    glTranslatef(0.0,0.0,-10.0);
+    Zvalue = -10.0;
   }
   if (view_mode == 1){ //PERSECTIVE VIEW
     glMatrixMode (GL_PROJECTION);
@@ -149,11 +155,21 @@ void drawScene(){
     glFrustum(Pleft, Pright, Pbottom, Ptop, Pnear, Pfar);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    glTranslatef(0.0,0.0,-10.0);
+    Zvalue = -10.0;
   }
 
-  translate_obj(Xvalue, Yvalue, Zvalue);
-  rotate_obj(Xangle, Yangle, Zangle);
-  
+
+  //////////////////////////////////////////
+  //////////////////////////////////////////
+
+  rotate_obj();
+  translate_obj();
+  cout << endl;
+  //////////////////////////////////////////
+  //////////////////////////////////////////
+
+
   glColor3f(1.0, 1.0, 1.0); //make object white
   glPushMatrix();
   glCallList(anObject);
@@ -286,7 +302,7 @@ void resize(int w, int h){
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	
+
 }
 
 void reset(){
@@ -294,21 +310,48 @@ void reset(){
   Xangle = 0.0, Yangle = 0.0, Zangle = 0.0;
   Oleft = -1.0, Oright = 1.0, Obottom = -1.0, Otop = 1.0, Onear = -8.0, Ofar = 100.0;
   Pleft = -1.0, Pright = 1.0, Pbottom = -1.0, Ptop = 1.0, Pnear = 9.0, Pfar = 100.0;
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
   glutPostRedisplay();
 }
 
-void translate_obj(float Xvalue, float Yvalue, float Zvalue){
-  //textbook fig4.8
-  glTranslatef(Xvalue, Yvalue, Zvalue);
-  //glRotatef(Zangle, 0.0, 0.0, 1.0);
-  //glRotatef(Yangle, 0.0, 1.0, 0.0);
-  //glRotatef(Xangle, 1.0, 0.0, 0.0);
+void translate_obj(){
+  //glTranslatef(Xvalue, Yvalue, Zvalue);
+  //must translate on local axis
+
+  GLfloat matrixf[16];
+  glGetFloatv(GL_MODELVIEW_MATRIX, matrixf);
+  //apply current rotation matrix to translation vector, then translate with the product
+  local_x = matrixf[0]*Xvalue+ matrixf[4]*Yvalue+matrixf[8]*Zvalue;
+  local_y = matrixf[1]*Xvalue+ matrixf[5]*Yvalue+matrixf[9]*Zvalue;
+  local_z = matrixf[2]*Xvalue+ matrixf[6]*Yvalue+matrixf[10]*Zvalue;
+  cout << "trans vector: "<< local_x << " " << local_y << " " << local_z << " " << endl;
+  matrixf[12] = local_x;
+  matrixf[13] = local_y;
+  matrixf[14] = local_z;
+
+  cout << "translate: ";
+  for (float f: matrixf) cout << f << " ";
+  cout << endl;
+  glLoadMatrixf(matrixf);
+
 }
 
 
 
-void rotate_obj(float Xangle, float Yangle, float Zangle){
+
+void rotate_obj(){
+  //must rotate around local axis
+  //translate to origin, rotate, then translate back
   glRotatef(Zangle, 0.0, 0.0, 1.0);
   glRotatef(Yangle, 0.0, 1.0, 0.0);
   glRotatef(Xangle, 1.0, 0.0, 0.0);
+
+  GLfloat matrixf[16];
+  glGetFloatv(GL_MODELVIEW_MATRIX, matrixf);
+  cout << "rotate: ";
+  for (float f: matrixf) cout << f << " ";
+  cout << endl;
+
+
 }
