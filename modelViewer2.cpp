@@ -37,10 +37,10 @@ static float Xvalue = 0.0, Yvalue = 0.0, Zvalue = -10.0;// values to translate
 static float tx = 0.0, ty = 0.0, tz = 0.0;
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // angles to rotate object (degrees)
 static float camXangle = 0.0, camYangle = 0.0, camZangle = 0.0; // angles to rotate camera (degrees)
-float eyeX = 0.0, eyeY = 0.0, eyeZ = 0.0, centerX = 0.0, centerY = 0.0, centerZ = -10.0, upX = 0.0, upY = 0.1, upZ = 0.0;
+static float eyeX = 0.0, eyeY = 0.0, eyeZ = 0.0, centerX = 0.0, centerY = 0.0, centerZ = -10.0, upX = 0.0, upY = 0.1, upZ = 0.0;
 static float Oleft = -1.0, Oright = 1.0, Obottom = -1.0, Otop = 1.0, Onear = -8.0, Ofar = 100.0; //camera for Ortho mode
 static float Pleft = -1.0, Pright = 1.0, Pbottom = -1.0, Ptop = 1.0, Pnear = 8.0, Pfar = 100.0; //camera for Perspective mode
-static int view_mode = 0;
+static int view_mode = 1;
 
 // GLfloat rotation_maatrix[16];
 // GLfloat translation_matrix[16];
@@ -57,9 +57,9 @@ void reset();
 void translate_obj();
 void rotate_obj();
 void rotate_camera();
-void tilt_camera(int direction);
-void pan_camera(int direction);
-void roll_camera(int direction);
+void tilt_camera();
+void pan_camera();
+void roll_camera();
 float deg_to_rad(float degree);
 
 ////////////////////////////////////////////////////////////////////////////
@@ -124,7 +124,6 @@ void drawScene(){
     glMatrixMode(GL_PROJECTION);
   	glLoadIdentity();
     glOrtho(Oleft, Oright, Obottom, Otop, Onear, Ofar);
-    gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
   	glMatrixMode(GL_MODELVIEW);
   	glLoadIdentity();
   }
@@ -194,42 +193,26 @@ void rotate_obj(){
   // cout << endl;
 }
 
-void tilt_camera(int direction){
-  float theta = deg_to_rad(1);
-  if (direction == 0){
-    centerY = cos(theta)*centerY - sin(theta)*centerZ;
-    centerZ = sin(theta)*centerY + cos(theta)*centerZ;
-  }
-  else{
-    centerY = cos(theta)*centerY + sin(theta)*centerZ;
-    centerZ = -1*sin(theta)*centerY + cos(theta)*centerZ;
-  }
+void tilt_camera(){
+  //reset center
+  centerX = 0.0, centerY = 0.0, centerZ = -10.0;
+  float theta = deg_to_rad(camXangle);
+  centerY = cos(theta)*centerY - sin(theta)*centerZ;
+  centerZ = sin(theta)*centerY + cos(theta)*centerZ;
   cout << centerX << " " << centerY << " " << centerZ << endl ;
 }
-
-void pan_camera(int direction){
-  float theta = deg_to_rad(1);
-  if (direction == 0){
-    centerX = cos(theta)*centerX + sin(theta)*centerZ;
-    centerZ = -1*sin(theta)*centerX + cos(theta)*centerZ;
-  }
-  else {
-    centerX = cos(theta)*centerX - sin(theta)*centerZ;
-    centerZ = sin(theta)*centerX + cos(theta)*centerZ;
-  }
+void pan_camera(){
+  centerX = 0.0, centerY = 0.0, centerZ = -10.0;
+  float theta = deg_to_rad(camYangle);
+  centerX = cos(theta)*centerX + sin(theta)*centerZ;
+  centerZ = -1*sin(theta)*centerX + cos(theta)*centerZ;
   cout << centerX << " " << centerY << " " << centerZ << endl ;
 }
-
-void roll_camera(int direction){
-  float theta = deg_to_rad(10);
-  if (direction == 0){
-    upX = cos(theta)*upX - sin(theta)*upY;
-    upY = sin(theta)*upX + cos(theta)*upY;
-  }
-  else{
-    upX = cos(theta)*upX + sin(theta)*upY;
-    upY = -1*sin(theta)*upX + cos(theta)*upY;
-  }
+void roll_camera(){
+  upX = 0.0, upY = 0.1, upZ = 0.0;
+  float theta = deg_to_rad(camZangle);
+  upX = cos(theta)*upX - sin(theta)*upY;
+  upY = sin(theta)*upX + cos(theta)*upY;
 }
 
 float deg_to_rad(float degree){
@@ -337,34 +320,34 @@ void keyInput(unsigned char key, int x, int y){
 
       //camera rotation
       case 't':
-        // camXangle -= 1.0;
-        // if (camXangle < 0.0) camXangle += 360.0;
-        tilt_camera(1);
+        camXangle -= 1.0;
+        if (camXangle < 0.0) camXangle += 360.0;
+        tilt_camera();
         break;
       case 'T':
-        // camXangle += 1.0;
-        // if (camXangle > 360.0) camXangle -= 360.0;
-        tilt_camera(0);
+        camXangle += 1.0;
+        if (camXangle > 360.0) camXangle -= 360.0;
+        tilt_camera();
         break;
       case 'a':
-        // camYangle -= 1.0;
-        // if (camYangle < 0.0) camYangle += 360.0;
-        pan_camera(1);
+        camYangle -= 1.0;
+        if (camYangle < 0.0) camYangle += 360.0;
+        pan_camera();
         break;
       case 'A':
-        // camYangle += 1.0;
-        // if (camYangle > 360.0) camYangle -= 360.0;
-        pan_camera(0);
+        camYangle += 1.0;
+        if (camYangle > 360.0) camYangle -= 360.0;
+        pan_camera();
         break;
       case 'l':
-        // camZangle -= 10.0;
-        // if (camZangle < 0.0) camZangle += 360.0;
-        roll_camera(1);
+        camZangle -= 10.0;
+        if (camZangle < 0.0) camZangle += 360.0;
+        roll_camera();
         break;
       case 'L':
-        // camZangle += 10.0;
-        // if (camZangle > 360.0) camZangle -= 360.0;
-        roll_camera(0);
+        camZangle += 10.0;
+        if (camZangle > 360.0) camZangle -= 360.0;
+        roll_camera();
         break;
 
 
