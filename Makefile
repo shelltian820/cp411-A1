@@ -6,8 +6,10 @@ ifeq ($(OS), Linux)
 endif
 
 ifeq ($(OS), Darwin)
-  FLAGS = -framework Cocoa -framework OpenGL -framework GLUT -I/usr/local/opt/glew/include -I/opt/X11/include -L/usr/local/opt/glew/lib -L/opt/X11/lib -lGLEW -lGLUT -Wno-write-strings 
+  FLAGS = -framework Cocoa -framework OpenGL -framework GLUT -I/usr/local/opt/glew/include -I/opt/X11/include -L/usr/local/opt/glew/lib -L/opt/X11/lib -lGLEW -lGLUT -Wno-write-strings
 endif
+
+all: $(patsubst %.cpp, %, $(wildcard *.cpp))
 
 %: %.cpp
 	g++ -std=c++11 $*.cpp -o $* $(FLAGS)
