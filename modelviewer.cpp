@@ -10,8 +10,8 @@
 #include <vector>
 #include <iomanip>
 #include <cmath>
-#include "readwrite.cpp"
-#include "transform.cpp"
+#include "readwrite.h"
+#include "transform.h"
 
 #ifdef __APPLE__
 #  include <GL/glew.h>
@@ -82,8 +82,8 @@ int main(int argc, char *argv[]){
   read(input, v_vector, f_vector);
 
   //center & scale object
-  center_point = center(v_vector);
-  obj_scale = scale(v_vector);
+  center(v_vector);
+  scale(v_vector);
 
   //set up OpenGL
   glutInit(&argc, argv);
@@ -228,7 +228,7 @@ void pan_camera(int direction){
     centerX = cos(theta)*centerX - sin(theta)*centerZ;
     centerZ = sin(theta)*centerX + cos(theta)*centerZ;
   }
-  cout << centerX << " " << centerY << " " << centerZ << endl ;
+  //cout << centerX << " " << centerY << " " << centerZ << endl ;
 }
 
 void roll_camera(int direction){
