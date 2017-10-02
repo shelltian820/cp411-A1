@@ -1,5 +1,6 @@
-//figure out camera rotations
-
+//good copy
+//fogging works?
+//double buffer works
 
 #include <string>
 #include <iostream>
@@ -36,15 +37,12 @@ static float obj_scale;
 static float Xvalue = 0.0, Yvalue = 0.0, Zvalue = -10.0;// values to translate
 static float tx = 0.0, ty = 0.0, tz = 0.0;
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // angles to rotate object (degrees)
-static float camXangle = 0.0, camYangle = 0.0, camZangle = 0.0; // angles to rotate camera (degrees)
+//static float camXangle = 0.0, camYangle = 0.0, camZangle = 0.0; // angles to rotate camera (degrees)
 float eyeX = 0.0, eyeY = 0.0, eyeZ = 0.0, centerX = 0.0, centerY = 0.0, centerZ = -10.0, upX = 0.0, upY = 0.1, upZ = 0.0;
 static float Oleft = -1.0, Oright = 1.0, Obottom = -1.0, Otop = 1.0, Onear = -8.0, Ofar = 100.0; //camera for Ortho mode
 static float Pleft = -1.0, Pright = 1.0, Pbottom = -1.0, Ptop = 1.0, Pnear = 8.0, Pfar = 100.0; //camera for Perspective mode
 static int view_mode = 0;
-
-// GLfloat rotation_maatrix[16];
-// GLfloat translation_matrix[16];
-
+static int fog_mode = 0;
 
 
 //function prototypes
@@ -61,6 +59,7 @@ void tilt_camera(int direction);
 void pan_camera(int direction);
 void roll_camera(int direction);
 float deg_to_rad(float degree);
+
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -90,7 +89,7 @@ int main(int argc, char *argv[]){
   glutInit(&argc, argv);
   glutInitContextVersion(4, 3);
   glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
   glutInitWindowSize(500, 500);
   glutInitWindowPosition(100, 100);
   glutCreateWindow("Object");
@@ -118,6 +117,15 @@ int main(int argc, char *argv[]){
 void drawScene(){
   glClear (GL_COLOR_BUFFER_BIT);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //wireframe mode
+  float fogColor[4] = {0.0, 0.0, 0.0, 1.0};
+  float fogStart = 10.0;
+  float fogEnd = 11.0;
+  if (fog_mode) glEnable(GL_FOG); else glDisable(GL_FOG);
+  glFogfv(GL_FOG_COLOR, fogColor);
+  glFogf(GL_FOG_MODE, GL_LINEAR);
+  glFogf(GL_FOG_START, fogStart);
+  glFogf(GL_FOG_END, fogEnd);
+
 
   //toggle perspective
   if (view_mode == 0){ //ORTHOGRAPHIC VIEW
@@ -135,26 +143,29 @@ void drawScene(){
     gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    //gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
   }
 
   //////////////////////////////////////////
   //////////////////////////////////////////
   rotate_obj();
   translate_obj();
-
   //////////////////////////////////////////
   //////////////////////////////////////////
-
 
   glColor3f(1.0, 1.0, 1.0); //make object white
   glPushMatrix();
   glCallList(anObject);
   glPopMatrix();
 
-  glFlush();
-
+  //glFlush();
+  glutSwapBuffers();
 }
+
+
+
+
+
+
 
 void translate_obj(){
 
@@ -204,7 +215,7 @@ void tilt_camera(int direction){
     centerY = cos(theta)*centerY + sin(theta)*centerZ;
     centerZ = -1*sin(theta)*centerY + cos(theta)*centerZ;
   }
-  cout << centerX << " " << centerY << " " << centerZ << endl ;
+  //cout << centerX << " " << centerY << " " << centerZ << endl ;
 }
 
 void pan_camera(int direction){
@@ -265,6 +276,12 @@ void keyInput(unsigned char key, int x, int y){
         break;
       case 'V':
         view_mode = 1;
+        break;
+      case 'f':
+        fog_mode = 0;
+        break;
+      case 'F':
+        fog_mode = 1;
         break;
 
       //object translation
